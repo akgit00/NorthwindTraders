@@ -44,30 +44,24 @@ public class App {
             System.exit(1);
         }
     }
-    public static void displayAllProducts (Connection connection){
+    public static void displayAllProducts(Connection connection) {
 
-        //we gots to try to run a query and get the results with a prepared statement
         try (
-
-                //create the prepared statment using the passed in connection
                 PreparedStatement preparedStatement = connection.prepareStatement("""
-                            SELECT
-                                ProductName,
-                                UnitPrice,
-                                UnitsInStock
-                            FROM
-                                Products
-                            ORDER BY
-                                ProductName
-                            """
-                );
+                SELECT
+                    ProductID,
+                    ProductName,
+                    UnitPrice,
+                    UnitsInStock
+                FROM
+                    Products
+                ORDER BY
+                    ProductID
+            """);
 
-                //get the results from the query
                 ResultSet results = preparedStatement.executeQuery();
-
         ) {
 
-            //print the results
             printResults(results);
 
         } catch (SQLException e) {
@@ -78,28 +72,19 @@ public class App {
 
     //this method will be used in the displayMethods to actually print the results to the screen
     public static void printResults(ResultSet results) throws SQLException {
-        //get the meta data so we have access to the field names
-        ResultSetMetaData metaData = results.getMetaData();
-        //get the number of rows returned
-        int columnCount = metaData.getColumnCount();
 
-        //this is looping over all the results from the DB
+        System.out.printf("%-5s %-30s %-10s %-10s\n",
+                "ID", "Name", "Price", "Stock");
+        System.out.println("--------------------------------------------------------------");
+
         while (results.next()) {
+            int id = results.getInt("ProductID");
+            String name = results.getString("ProductName");
+            double price = results.getDouble("UnitPrice");
+            int stock = results.getInt("UnitsInStock");
 
-            //loop over each column in the rown and display the data
-            for (int i = 1; i <= columnCount; i++) {
-                //gets the current colum name
-                String columnName = metaData.getColumnName(i);
-                //get the current column value
-                String value = results.getString(i);
-                //print out the column name and column value
-                System.out.println(columnName + ": " + value + " ");
-            }
-
-            //print an empty line to make the results prettier
-            System.out.println();
-
+            System.out.printf("%-5d %-30s %-10.2f %-10d\n",
+                    id, name, price, stock);
         }
-
     }
 }
