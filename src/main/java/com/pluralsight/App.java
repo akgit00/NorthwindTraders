@@ -115,6 +115,23 @@ public class App {
         displayProductsByCategory(connection, categoryId);
     }
 
+    public static void displayProductsByCategory(Connection connection, int categoryId) {
+
+        try (
+                PreparedStatement ps = connection.prepareStatement("""
+                    SELECT 
+                        ProductID,
+                        ProductName,
+                        UnitPrice,
+                        UnitsInStock
+                    FROM Products
+                    WHERE CategoryID = ?
+                    ORDER BY ProductID
+                    """
+
+
+                        }
+
 
     public static void displayAllCustomers(Connection connection) {
 
