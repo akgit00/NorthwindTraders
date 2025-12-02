@@ -26,17 +26,32 @@ public class App {
 
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind", username, password)) {
 
-            while (true) {
+            boolean running  = true;
+
+            while (running) {
 
                 System.out.println("""
-                        What do you want to do?
-                            1) Display All Products
+                       What do you want to do?
+                        1) Display all products
+                        2) Display all customers
+                        0) Exit
+                        Select an option:
                         """);
+
 
                 switch (myScanner.nextInt()) {
                     case 1:
                         displayAllProducts(connection);
                         break;
+                    case 2:
+                        displayAllCustomers(connection);
+                        break;
+                    case 0:
+                        running = false;
+                        System.out.println("Goodbye!");
+                        break;
+                    default:
+                        System.out.println("Invalid option.");
                 }
             }
         } catch (SQLException e) {
@@ -70,21 +85,46 @@ public class App {
         }
     }
 
+
+    public static void displayAllCustomers(Connection connection) {
+
+        try (
+                PreparedStatement ps = connection.prepareStatement("""
+                        SELECT 
+                            ContactName,
+                            CompanyName,
+                            City,
+                            Country,
+                            Phone
+                        FROM Customers
+                        ORDER BY Country
+                        """);
+                ResultSet results = ps.executeQuery()
+        ) {
+            printResults(results);
+
+        } catch (SQLException e) {
+            System.out.println("Could not retrieve customers.");
+        }
+    }
+
+
+
     //this method will be used in the displayMethods to actually print the results to the screen
     public static void printResults(ResultSet results) throws SQLException {
 
-        System.out.printf("%-5s %-30s %-10s %-10s\n",
-                "ID", "Name", "Price", "Stock");
-        System.out.println("--------------------------------------------------------------");
+        ResultSetMetaData meta = results.getMetaData();
+        int columnCount = meta.getColumnCount();
 
         while (results.next()) {
-            int id = results.getInt("ProductID");
-            String name = results.getString("ProductName");
-            double price = results.getDouble("UnitPrice");
-            int stock = results.getInt("UnitsInStock");
 
-            System.out.printf("%-5d %-30s %-10.2f %-10d\n",
-                    id, name, price, stock);
+            for (int i = 1; i <= columnCount; i++) {
+                String colName = meta.getColumnName(i);
+                String value = results.getString(i);
+                System.out.println(colName + ": " + value);
+            }
+
+            System.out.println("------------------------");
         }
     }
 }
