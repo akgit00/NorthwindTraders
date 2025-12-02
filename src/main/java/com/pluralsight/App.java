@@ -31,12 +31,13 @@ public class App {
             while (running) {
 
                 System.out.println("""
-                       What do you want to do?
-                        1) Display all products
-                        2) Display all customers
-                        0) Exit
-                        Select an option:
-                        """);
+                What do you want to do?
+                1) Display all products
+                2) Display all customers
+                3) Display all categories
+                0) Exit
+                Select an option:
+                """);
 
 
                 switch (myScanner.nextInt()) {
@@ -45,6 +46,9 @@ public class App {
                         break;
                     case 2:
                         displayAllCustomers(connection);
+                        break;
+                    case 3:
+                        displayAllCategories(connection, scanner);
                         break;
                     case 0:
                         running = false;
