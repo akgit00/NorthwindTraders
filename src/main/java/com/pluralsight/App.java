@@ -89,6 +89,32 @@ public class App {
         }
     }
 
+    public static void displayAllCategories(Connection connection, Scanner scanner) {
+
+        // first display all categories
+        try (
+                PreparedStatement ps = connection.prepareStatement("""
+                    SELECT CategoryID, CategoryName
+                    FROM Categories
+                    ORDER BY CategoryID
+                    """);
+                ResultSet results = ps.executeQuery()
+        ) {
+            System.out.println("CATEGORIES:");
+            printResults(results);
+
+        } catch (SQLException e) {
+            System.out.println("Could not retrieve categories.");
+            return;
+        }
+
+        // ask user which category they want
+        System.out.print("Enter a Category ID to view its products: ");
+        int categoryId = scanner.nextInt();
+
+        displayProductsByCategory(connection, categoryId);
+    }
+
 
     public static void displayAllCustomers(Connection connection) {
 
