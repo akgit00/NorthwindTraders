@@ -26,18 +26,18 @@ public class App {
 
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind", username, password)) {
 
-            boolean running  = true;
+            boolean running = true;
 
             while (running) {
 
                 System.out.println("""
-                What do you want to do?
-                1) Display all products
-                2) Display all customers
-                3) Display all categories
-                0) Exit
-                Select an option:
-                """);
+                        What do you want to do?
+                        1) Display all products
+                        2) Display all customers
+                        3) Display all categories
+                        0) Exit
+                        Select an option:
+                        """);
 
 
                 switch (myScanner.nextInt()) {
@@ -48,7 +48,7 @@ public class App {
                         displayAllCustomers(connection);
                         break;
                     case 3:
-                        displayAllCategories(connection, scanner);
+                        displayAllCategories(connection, myScanner);
                         break;
                     case 0:
                         running = false;
@@ -63,20 +63,21 @@ public class App {
             System.exit(1);
         }
     }
+
     public static void displayAllProducts(Connection connection) {
 
         try (
                 PreparedStatement preparedStatement = connection.prepareStatement("""
-                SELECT
-                    ProductID,
-                    ProductName,
-                    UnitPrice,
-                    UnitsInStock
-                FROM
-                    Products
-                ORDER BY
-                    ProductID
-            """);
+                            SELECT
+                                ProductID,
+                                ProductName,
+                                UnitPrice,
+                                UnitsInStock
+                            FROM
+                                Products
+                            ORDER BY
+                                ProductID
+                        """);
 
                 ResultSet results = preparedStatement.executeQuery();
         ) {
@@ -94,10 +95,10 @@ public class App {
         // first display all categories
         try (
                 PreparedStatement ps = connection.prepareStatement("""
-                    SELECT CategoryID, CategoryName
-                    FROM Categories
-                    ORDER BY CategoryID
-                    """);
+                        SELECT CategoryID, CategoryName
+                        FROM Categories
+                        ORDER BY CategoryID
+                        """);
                 ResultSet results = ps.executeQuery()
         ) {
             System.out.println("CATEGORIES:");
@@ -119,18 +120,27 @@ public class App {
 
         try (
                 PreparedStatement ps = connection.prepareStatement("""
-                    SELECT 
-                        ProductID,
-                        ProductName,
-                        UnitPrice,
-                        UnitsInStock
-                    FROM Products
-                    WHERE CategoryID = ?
-                    ORDER BY ProductID
-                    """
+                        SELECT 
+                            ProductID,
+                            ProductName,
+                            UnitPrice,
+                            UnitsInStock
+                        FROM Products
+                        WHERE CategoryID = ?
+                        ORDER BY ProductID
+                        """)
+        ) {
+            ps.setInt(1, categoryId);
 
+            try (ResultSet results = ps.executeQuery()) {
+                System.out.println("PRODUCTS IN CATEGORY " + categoryId + ":");
+                printResults(results);
+            }
 
-                        }
+        } catch (SQLException e) {
+            System.out.println("Could not retrieve products for that category.");
+        }
+    }
 
 
     public static void displayAllCustomers(Connection connection) {
